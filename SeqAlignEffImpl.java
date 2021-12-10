@@ -7,17 +7,20 @@ import java.util.*;
 
 class SeqAlignEffImpl {
 
+	// class to store final min alignment
 	private static class Solution {
 		String alignment1;
 		String alignment2;
 		int minPenalty;
 	}
 
+	// hardcoded gap penalty and mismatch penalty array
 	private static int pgap = 30;
 	private static int[][] mismatchArr = { { 0, 110, 48, 94 }, { 110, 0, 118, 48 }, { 48, 118, 0, 110 },
 			{ 94, 48, 110, 0 } };
 	private static int minPen = 0;
 
+	// function that reads "input.txt" and generates strings from base values
 	public String[] inputGen() {
 		BufferedReader reader;
 		String regex = "[0-9]*";
@@ -54,6 +57,7 @@ class SeqAlignEffImpl {
 		return res;
 	}
 
+	// function to return mismatch penalty for x,y
 	static int getMismatchCost(char x, char y) {
 		int i, j;
 		if (x == 'A')
@@ -123,6 +127,7 @@ class SeqAlignEffImpl {
 		return res;
 	}
 
+	// dynamic programming implementation of sequence alignment problem
 	static Solution getMinPenalty(String x, String y) {
 		int i, j;
 		int m = x.length();
@@ -138,6 +143,7 @@ class SeqAlignEffImpl {
 			dp[0][i] = i * pgap;
 		}
 
+		// fill in dp array
 		for (i = 1; i <= m; i++) {
 			for (j = 1; j <= n; j++) {
 				if (x.charAt(i - 1) == y.charAt(j - 1)) {
@@ -161,6 +167,7 @@ class SeqAlignEffImpl {
 		int xans[] = new int[l + 1];
 		int yans[] = new int[l + 1];
 
+		// reconstruct alignment strings
 		while (!(i == 0 || j == 0)) {
 			if (x.charAt(i - 1) == y.charAt(j - 1)) {
 				xans[xpos--] = (int) x.charAt(i - 1);
@@ -222,6 +229,7 @@ class SeqAlignEffImpl {
 		return s;
 	}
 
+	// efficient divide and conquer implementation of sequence alignment problem
 	static Solution getMinPenaltyEff(String x, String y) {
 		int m = x.length();
 		int n = y.length();
@@ -262,18 +270,28 @@ class SeqAlignEffImpl {
 
 	}
 
-	static void genOutputFile(double duration, float memory, Solution s) {
+	// generate "output.txt" having alignment strings, min alignment cost and
+	// performance metrics
+	static void genOutputFile(double duration, double memory, Solution s) {
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter("output.txt"));
-			writer.write(s.alignment1.substring(0, 50) + " " + s.alignment1.substring(s.alignment1.length() - 50));
+			if (s.alignment1.length() <= 50) {
+				writer.write(s.alignment1);
+			} else {
+				writer.write(s.alignment1.substring(0, 50) + " " + s.alignment1.substring(s.alignment1.length() - 50));
+			}
 			writer.newLine();
-			writer.write(s.alignment2.substring(0, 50) + " " + s.alignment2.substring(s.alignment2.length() - 50));
+			if (s.alignment2.length() <= 50) {
+				writer.write(s.alignment2);
+			} else {
+				writer.write(s.alignment2.substring(0, 50) + " " + s.alignment2.substring(s.alignment2.length() - 50));
+			}
 			writer.newLine();
-			writer.write(Integer.toString(s.minPenalty));
+			writer.write(Float.toString((float) s.minPenalty));
 			writer.newLine();
 			writer.write(Double.toString(duration));
 			writer.newLine();
-			writer.write(Float.toString(memory));
+			writer.write(Double.toString(memory));
 
 			writer.close();
 		} catch (IOException e) {
@@ -282,17 +300,19 @@ class SeqAlignEffImpl {
 	}
 
 	public static void main(String[] args) {
+		Runtime runtime = Runtime.getRuntime();
+		runtime.gc();
 		SeqAlignEffImpl s = new SeqAlignEffImpl();
 		double start = System.nanoTime();
-		float beforeUsedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+		double beforeUsedMem = runtime.totalMemory() - runtime.freeMemory();
 		String[] input = new String[2];
 		input = s.inputGen();
 		Solution sln = new Solution();
 		sln = s.getMinPenaltyEff(input[0], input[1]);
 		double end = System.nanoTime();
-		double duration = (end - start) * 0.00000001;
-		float afterUsedMem = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
-		float mem = afterUsedMem - beforeUsedMem;
+		double duration = (end - start) * 0.000000001;
+		double afterUsedMem = runtime.totalMemory() - runtime.freeMemory();
+		double mem = (afterUsedMem - beforeUsedMem) / 1024;
 		s.genOutputFile(duration, mem, sln);
 	}
 }
