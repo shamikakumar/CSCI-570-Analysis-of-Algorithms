@@ -254,7 +254,7 @@ class SeqAlignEffImpl {
 
 			Solution res = new Solution();
 			res.alignment1 = callLeft.alignment1 + callRight.alignment1;
-			res.alignment2 = callLeft.alignment1 + callRight.alignment2;
+			res.alignment2 = callLeft.alignment2 + callRight.alignment2;
 			res.minPenalty = callLeft.minPenalty + callRight.minPenalty;
 
 			return res;
